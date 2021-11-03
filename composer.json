@@ -1,0 +1,36 @@
+{
+    "name": "dmytrof/doctrine-modification-events-bundle",
+    "type": "symfony-bundle",
+    "description": "Symfony DmytrofDoctrineModificationEventsBundle to create and handle events on entities updates",
+    "keywords": ["Doctrine", "Modification events"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Dmytro Feshchenko",
+            "email": "dmytro.feshchenko@gmail.com"
+        }
+    ],
+    "require": {
+        "php": "^7.2 || ^8.0",
+        "symfony/framework-bundle": "^4.3 || ^5.0",
+        "symfony/event-dispatcher": "^4.3 || ^5.0",
+        "doctrine/orm": "^2.6"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^8.3 || ^9.1",
+        "roave/security-advisories": "dev-latest"
+    },
+    "autoload": {
+        "psr-4": {
+            "Dmytrof\\DmytrofDoctrineModificationEventsBundle\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Dmytrof\\DmytrofDoctrineModificationEventsBundle\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "test": "phpunit"
+    }
+}
