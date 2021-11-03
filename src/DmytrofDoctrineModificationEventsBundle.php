@@ -13,6 +13,6 @@ namespace Dmytrof\DoctrineModificationEventsBundle;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
-class DmytrofDoctrineModificationEventsBundl extends Bundle
+class DmytrofDoctrineModificationEventsBundle extends Bundle
 {
 }
