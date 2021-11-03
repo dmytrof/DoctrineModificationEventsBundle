@@ -22,12 +22,12 @@
     },
     "autoload": {
         "psr-4": {
-            "Dmytrof\\DmytrofDoctrineModificationEventsBundle\\": "src/"
+            "Dmytrof\\DoctrineModificationEventsBundle\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Dmytrof\\DmytrofDoctrineModificationEventsBundle\\Tests\\": "tests/"
+            "Dmytrof\\DoctrineModificationEventsBundle\\Tests\\": "tests/"
         }
     },
     "scripts": {
