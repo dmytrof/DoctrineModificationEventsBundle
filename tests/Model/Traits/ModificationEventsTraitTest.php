@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection PhpIllegalPsrClassPathInspection */
 
 /*
  * This file is part of the DmytrofDoctrineModificationEventsBundle package.
@@ -11,7 +11,9 @@
 
 namespace Dmytrof\DoctrineModificationEventsBundle\Tests\Model\Traits;
 
+use Dmytrof\DoctrineModificationEventsBundle\Event\LongLifeModificationEventInterface;
 use Dmytrof\DoctrineModificationEventsBundle\Event\ModificationEvent;
+use Dmytrof\DoctrineModificationEventsBundle\Event\ModificationEventInterface;
 use Dmytrof\DoctrineModificationEventsBundle\Model\{ModificationEventsInterface, Traits\ModificationEventsTrait};
 use PHPUnit\Framework\TestCase;
 
@@ -22,9 +24,31 @@ class ModificationEventsTraitTest extends TestCase
         $modelWithModificationEvents = new class implements ModificationEventsInterface {
             use ModificationEventsTrait;
 
-            public function setSomething($value)
+            public function setSomething($value): void
             {
                 $logEvent = new class ($value) extends ModificationEvent {
+
+                    private $value;
+
+                    public function __construct($value)
+                    {
+                        $this->value = $value;
+                    }
+
+                    /**
+                     * @return mixed
+                     */
+                    public function getValue()
+                    {
+                        return $this->value;
+                    }
+                };
+                $this->addModificationEvent($logEvent);
+            }
+
+            public function setLongLifeValue($value): void
+            {
+                $logEvent = new class ($value) extends ModificationEvent implements LongLifeModificationEventInterface {
 
                     private $value;
 
@@ -56,8 +80,23 @@ class ModificationEventsTraitTest extends TestCase
         $this->assertInstanceOf(ModificationEvent::class, $modelWithModificationEvents->getModificationEvents()[1]);
         $this->assertEquals('qwer', $modelWithModificationEvents->getModificationEvents()[1]->getValue());
 
-        $this->assertInstanceOf(get_class($modelWithModificationEvents), $modelWithModificationEvents->cleanupModificationEvents());
+        $modelWithModificationEvents->setLongLifeValue('longLife');
+        $this->assertCount(3, $modelWithModificationEvents->getModificationEvents());
+        $this->assertInstanceOf(LongLifeModificationEventInterface::class, $modelWithModificationEvents->getModificationEvents()[2]);
+        $this->assertEquals('longLife', $modelWithModificationEvents->getModificationEvents()[2]->getValue());
 
-        $this->assertEquals([], $modelWithModificationEvents->getModificationEvents());
+        $this->assertEquals('123', $modelWithModificationEvents->getModificationEvents(function (ModificationEventInterface $event) {
+            return $event->getValue() === 123;
+        })[0]->getValue());
+
+        $this->assertEquals('longLife', $modelWithModificationEvents->getModificationEvents(function (ModificationEventInterface $event) {
+            return $event instanceof LongLifeModificationEventInterface;
+        })[2]->getValue());
+
+        $this->assertInstanceOf(get_class($modelWithModificationEvents), $modelWithModificationEvents->cleanupModificationEvents(false));
+        $this->assertCount(1, $modelWithModificationEvents->getModificationEvents());
+
+        $this->assertInstanceOf(get_class($modelWithModificationEvents), $modelWithModificationEvents->cleanupModificationEvents());
+        $this->assertCount(0, $modelWithModificationEvents->getModificationEvents());
     }
 }

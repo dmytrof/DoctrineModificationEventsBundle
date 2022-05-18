@@ -50,7 +50,7 @@ class ModificationEventsDoctrineSubscriber implements EventSubscriber
      *
      * @return array
      */
-    public function getSubscribedEvents()
+    public function getSubscribedEvents(): array
     {
         return [
             Events::postPersist,
@@ -106,12 +106,16 @@ class ModificationEventsDoctrineSubscriber implements EventSubscriber
             foreach ($this->getUpdatedEntities() as $entity) {
                 if ($entity instanceof ModificationEventsInterface) {
                     foreach ($entity->getModificationEvents() as $event) {
-                        $this->eventDispatcher->dispatch($event);
-                        if ($event->isNeedsFlush()) {
-                            $this->setNeedsFlush(true);
+                        if (!$event->isDispatched()) {
+                            $this->eventDispatcher->dispatch($event);
+                            $event->setDispatched();
+
+                            if ($event->isNeedsFlush()) {
+                                $this->setNeedsFlush();
+                            }
                         }
                     }
-                    $entity->cleanupModificationEvents();
+                    $entity->cleanupModificationEvents(false);
                 }
             }
             $this->cleanupUpdatedEntities();

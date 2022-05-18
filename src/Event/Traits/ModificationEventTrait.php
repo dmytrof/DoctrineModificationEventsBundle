@@ -21,6 +21,11 @@ trait ModificationEventTrait
     protected $needsFlush = false;
 
     /**
+     * @var bool
+     */
+    protected $dispatched = false;
+
+    /**
      * Checks if flush needed
      * @see ModificationEventInterface::isNeedsFlush()
      */
@@ -36,6 +41,26 @@ trait ModificationEventTrait
     public function setNeedsFlush(bool $needsFlush = true): ModificationEventInterface
     {
         $this->needsFlush = $needsFlush;
+
+        return $this;
+    }
+
+    /**
+     * Checks if dispatcher
+     * @see ModificationEventInterface::isDispatched()
+     */
+    public function isDispatched(): bool
+    {
+        return $this->dispatched;
+    }
+
+    /**
+     * Sets dispatched
+     * @see ModificationEventInterface::setDispatched()
+     */
+    public function setDispatched(bool $dispatched = true): ModificationEventInterface
+    {
+        $this->dispatched = $dispatched;
 
         return $this;
     }

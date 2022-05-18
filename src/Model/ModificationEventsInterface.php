@@ -12,14 +12,16 @@
 namespace Dmytrof\DoctrineModificationEventsBundle\Model;
 
 use Dmytrof\DoctrineModificationEventsBundle\Event\ModificationEventInterface;
+use Closure;
 
 interface ModificationEventsInterface
 {
     /**
      * Returns modification events
+     * @param Closure|null $filterCallback
      * @return array|ModificationEventInterface[]
      */
-    public function getModificationEvents(): array;
+    public function getModificationEvents(Closure $filterCallback = null): array;
 
     /**
      * Adds modification events
@@ -30,7 +32,8 @@ interface ModificationEventsInterface
 
     /**
      * Clears modification events
+     * @param bool $withLongLifeEvents
      * @return $this
      */
-    public function cleanupModificationEvents(): self;
+    public function cleanupModificationEvents(bool $withLongLifeEvents = true): self;
 }

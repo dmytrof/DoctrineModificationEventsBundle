@@ -14,6 +14,19 @@ namespace Dmytrof\DoctrineModificationEventsBundle\Event;
 interface ModificationEventInterface
 {
     /**
+     * Checks if dispatcher
+     * @return bool
+     */
+    public function isDispatched(): bool;
+
+    /**
+     * Sets dispatched
+     * @param bool $dispatched
+     * @return $this
+     */
+    public function setDispatched(bool $dispatched = true): self;
+
+    /**
      * Checks if flush needed
      * @return bool
      */

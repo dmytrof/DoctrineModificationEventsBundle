@@ -11,8 +11,10 @@
 
 namespace Dmytrof\DoctrineModificationEventsBundle\Model\Traits;
 
+use Dmytrof\DoctrineModificationEventsBundle\Event\LongLifeModificationEventInterface;
 use Dmytrof\DoctrineModificationEventsBundle\Event\ModificationEventInterface;
 use Dmytrof\DoctrineModificationEventsBundle\Model\ModificationEventsInterface;
+use Closure;
 
 trait ModificationEventsTrait
 {
@@ -23,17 +25,20 @@ trait ModificationEventsTrait
 
     /**
      * Returns modification events
-     * @return array
+     * @see ModificationEventsInterface::getModificationEvents()
      */
-    public function getModificationEvents(): array
+    public function getModificationEvents(Closure $filterCallback = null): array
     {
-        return $this->modificationEvents;
+        if (!$filterCallback) {
+            return $this->modificationEvents;
+        }
+
+        return array_filter($this->getModificationEvents(), $filterCallback);
     }
 
     /**
      * Adds modification events
-     * @param ModificationEventInterface $event
-     * @return ModificationEventsInterface
+     * @see ModificationEventsInterface::addModificationEvent()
      */
     public function addModificationEvent(ModificationEventInterface $event): ModificationEventsInterface
     {
@@ -44,11 +49,13 @@ trait ModificationEventsTrait
 
     /**
      * Clears modification events
-     * @return ModificationEventsInterface
+     * @see ModificationEventsInterface::cleanupModificationEvents()
      */
-    public function cleanupModificationEvents(): ModificationEventsInterface
+    public function cleanupModificationEvents(bool $withLongLifeEvents = true): ModificationEventsInterface
     {
-        $this->modificationEvents = [];
+        $this->modificationEvents = $withLongLifeEvents ? [] : $this->getModificationEvents(function (ModificationEventInterface $event) {
+            return $event instanceof LongLifeModificationEventInterface;
+        });
 
         return $this;
     }
