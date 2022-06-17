@@ -85,6 +85,8 @@ class ModificationEventsTraitTest extends TestCase
         $this->assertInstanceOf(LongLifeModificationEventInterface::class, $modelWithModificationEvents->getModificationEvents()[2]);
         $this->assertEquals('longLife', $modelWithModificationEvents->getModificationEvents()[2]->getValue());
 
+        $this->assertCount(3, $modelWithModificationEvents->getNotDispatchedModificationEvents());
+
         $this->assertEquals('123', $modelWithModificationEvents->getModificationEvents(function (ModificationEventInterface $event) {
             return $event->getValue() === 123;
         })[0]->getValue());
@@ -92,6 +94,14 @@ class ModificationEventsTraitTest extends TestCase
         $this->assertEquals('longLife', $modelWithModificationEvents->getModificationEvents(function (ModificationEventInterface $event) {
             return $event instanceof LongLifeModificationEventInterface;
         })[2]->getValue());
+
+        $modelWithModificationEvents->getModificationEvents(function (ModificationEventInterface $event) {
+            return $event->getValue() === 123;
+        })[0]->setDispatched();
+        $this->assertCount(2, $modelWithModificationEvents->getNotDispatchedModificationEvents());
+
+        $this->assertInstanceOf(get_class($modelWithModificationEvents), $modelWithModificationEvents->cleanupDispatchedModificationEvents());
+        $this->assertCount(2, $modelWithModificationEvents->getModificationEvents());
 
         $this->assertInstanceOf(get_class($modelWithModificationEvents), $modelWithModificationEvents->cleanupModificationEvents(false));
         $this->assertCount(1, $modelWithModificationEvents->getModificationEvents());

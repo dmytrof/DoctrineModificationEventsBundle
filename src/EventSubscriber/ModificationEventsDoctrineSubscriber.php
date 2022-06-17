@@ -105,17 +105,16 @@ class ModificationEventsDoctrineSubscriber implements EventSubscriber
         if ($this->hasUpdatedEntities()) {
             foreach ($this->getUpdatedEntities() as $entity) {
                 if ($entity instanceof ModificationEventsInterface) {
-                    foreach ($entity->getModificationEvents() as $event) {
-                        if (!$event->isDispatched()) {
+                    while ($events = $entity->getNotDispatchedModificationEvents()) {
+                        foreach ($events as $event) {
                             $this->eventDispatcher->dispatch($event);
                             $event->setDispatched();
-
                             if ($event->isNeedsFlush()) {
                                 $this->setNeedsFlush();
                             }
                         }
+                        $entity->cleanupDispatchedModificationEvents();
                     }
-                    $entity->cleanupModificationEvents(false);
                 }
             }
             $this->cleanupUpdatedEntities();

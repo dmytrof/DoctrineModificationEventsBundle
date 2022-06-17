@@ -24,6 +24,12 @@ interface ModificationEventsInterface
     public function getModificationEvents(Closure $filterCallback = null): array;
 
     /**
+     * Returns not dispatched modification events
+     * @return array
+     */
+    public function getNotDispatchedModificationEvents(): array;
+
+    /**
      * Adds modification events
      * @param ModificationEventInterface $event
      * @return $this
@@ -36,4 +42,10 @@ interface ModificationEventsInterface
      * @return $this
      */
     public function cleanupModificationEvents(bool $withLongLifeEvents = true): self;
+
+    /**
+     * Clears dispatched modification events
+     * @return $this
+     */
+    public function cleanupDispatchedModificationEvents(): self;
 }

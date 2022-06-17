@@ -37,6 +37,17 @@ trait ModificationEventsTrait
     }
 
     /**
+     * Returns not dispatched modification events
+     * @see ModificationEventsInterface::getNotDispatchedModificationEvents()
+     */
+    public function getNotDispatchedModificationEvents(): array
+    {
+        return $this->getModificationEvents(function (ModificationEventInterface $event) {
+            return !$event->isDispatched();
+        });
+    }
+
+    /**
      * Adds modification events
      * @see ModificationEventsInterface::addModificationEvent()
      */
@@ -55,6 +66,21 @@ trait ModificationEventsTrait
     {
         $this->modificationEvents = $withLongLifeEvents ? [] : $this->getModificationEvents(function (ModificationEventInterface $event) {
             return $event instanceof LongLifeModificationEventInterface;
+        });
+
+        return $this;
+    }
+
+    /**
+     * Clears dispatcher modification events
+     * @see ModificationEventsInterface::cleanupDispatchedModificationEvents()
+     */
+    public function cleanupDispatchedModificationEvents(): ModificationEventsInterface
+    {
+        $this->modificationEvents = $this->getModificationEvents(function (ModificationEventInterface $event) {
+            return $event instanceof LongLifeModificationEventInterface
+                || !$event->isDispatched()
+            ;
         });
 
         return $this;
