@@ -147,8 +147,9 @@ class ModificationEventsDoctrineSubscriber implements EventSubscriber
      */
     protected function addUpdatedEntity($entity): self
     {
-        if (!in_array($entity, $this->updatedEntities)) {
-            $this->updatedEntities[] = $entity;
+        $entityKey = spl_object_hash($entity);
+        if (!($this->updatedEntities[$entityKey] ?? false)) {
+            $this->updatedEntities[$entityKey] = $entity;
         }
 
         return $this;
