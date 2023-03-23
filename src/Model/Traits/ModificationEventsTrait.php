@@ -42,9 +42,14 @@ trait ModificationEventsTrait
      */
     public function getNotDispatchedModificationEvents(): array
     {
-        return $this->getModificationEvents(function (ModificationEventInterface $event) {
+        $events = $this->getModificationEvents(function (ModificationEventInterface $event) {
             return !$event->isDispatched();
         });
+        usort($events, static function (ModificationEventInterface $eventA, ModificationEventInterface $eventB) {
+            return $eventB->getPriority() <=> $eventA->getPriority();
+        });
+
+        return $events;
     }
 
     /**

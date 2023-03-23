@@ -38,4 +38,18 @@ interface ModificationEventInterface
      * @return $this
      */
     public function setNeedsFlush(bool $needsFlush): self;
+
+    /**
+     * Returns priority
+     * @return int
+     */
+    public function getPriority(): int;
+
+    /**
+     * Sets priority
+     * @param int $priority
+     *
+     * @return $this
+     */
+    public function setPriority(int $priority): self;
 }

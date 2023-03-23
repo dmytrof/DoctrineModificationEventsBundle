@@ -26,6 +26,11 @@ trait ModificationEventTrait
     protected $dispatched = false;
 
     /**
+     * @var int
+     */
+    protected $priority = 0;
+
+    /**
      * Checks if flush needed
      * @see ModificationEventInterface::isNeedsFlush()
      */
@@ -61,6 +66,26 @@ trait ModificationEventTrait
     public function setDispatched(bool $dispatched = true): ModificationEventInterface
     {
         $this->dispatched = $dispatched;
+
+        return $this;
+    }
+
+    /**
+     * Sets priority
+     * @see ModificationEventInterface::getPriority()
+     */
+    public function getPriority(): int
+    {
+        return $this->priority;
+    }
+
+    /**
+     * Sets priority
+     * @see ModificationEventInterface::setPriority()
+     */
+    public function setPriority(int $priority): ModificationEventInterface
+    {
+        $this->priority = $priority;
 
         return $this;
     }
