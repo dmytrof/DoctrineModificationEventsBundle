@@ -11,6 +11,7 @@
 
 namespace Dmytrof\DoctrineModificationEventsBundle\EventSubscriber;
 
+use Dmytrof\DoctrineModificationEventsBundle\Event\ForceFlushPreviousModificationsInterface;
 use Dmytrof\DoctrineModificationEventsBundle\Model\ModificationEventsInterface;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 use Doctrine\ORM\Events;
@@ -107,6 +108,9 @@ class ModificationEventsDoctrineSubscriber implements EventSubscriber
                 if ($entity instanceof ModificationEventsInterface) {
                     while ($events = $entity->getNotDispatchedModificationEvents()) {
                         foreach ($events as $event) {
+                            if ($event instanceof ForceFlushPreviousModificationsInterface) {
+                                $this->makeFlushIfNeeded($args->getEntityManager());
+                            }
                             $this->eventDispatcher->dispatch($event);
                             $event->setDispatched();
                             if ($event->isNeedsFlush()) {

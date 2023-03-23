@@ -22,6 +22,7 @@ interface ModificationEventInterface
     /**
      * Sets dispatched
      * @param bool $dispatched
+     *
      * @return $this
      */
     public function setDispatched(bool $dispatched = true): self;
@@ -35,6 +36,7 @@ interface ModificationEventInterface
     /**
      * Sets needs flush
      * @param bool $needsFlush
+     *
      * @return $this
      */
     public function setNeedsFlush(bool $needsFlush): self;
