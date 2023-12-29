@@ -11,9 +11,6 @@
 
 namespace Dmytrof\DoctrineModificationEventsBundle\Event;
 
-/**
- * @deprecated Will be removed on next versions. Use TrackedModificationEventInterface instead
- */
-interface LongLifeModificationEventInterface extends ModificationEventInterface, TrackedModificationEventInterface
+interface TrackedModificationEventInterface
 {
 }

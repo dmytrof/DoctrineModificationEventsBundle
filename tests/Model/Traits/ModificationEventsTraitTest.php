@@ -11,7 +11,8 @@
 
 namespace Dmytrof\DoctrineModificationEventsBundle\Tests\Model\Traits;
 
-use Dmytrof\DoctrineModificationEventsBundle\Event\LongLifeModificationEventInterface;
+use Dmytrof\DoctrineModificationEventsBundle\Event\SingletonModificationEventInterface;
+use Dmytrof\DoctrineModificationEventsBundle\Event\TrackedModificationEventInterface;
 use Dmytrof\DoctrineModificationEventsBundle\Event\ModificationEvent;
 use Dmytrof\DoctrineModificationEventsBundle\Model\ModificationEventsInterface;
 use Dmytrof\DoctrineModificationEventsBundle\Model\Traits\ModificationEventsTrait;
@@ -19,7 +20,7 @@ use PHPUnit\Framework\TestCase;
 
 class ModificationEventsTraitTest extends TestCase
 {
-    public function testModificationEvents(): void
+    public function testaRegularModificationEvents(): void
     {
         $meModel = new class implements ModificationEventsInterface
         {
@@ -29,7 +30,6 @@ class ModificationEventsTraitTest extends TestCase
             {
                 $logEvent = new class ($value) extends ModificationEvent
                 {
-
                     private mixed $value;
 
                     public function __construct(mixed $value)
@@ -45,11 +45,10 @@ class ModificationEventsTraitTest extends TestCase
                 $this->addModificationEvent($logEvent);
             }
 
-            public function setLongLifeValue(mixed $value): void
+            public function setTrackedValue(mixed $value): void
             {
-                $logEvent = new class ($value) extends ModificationEvent implements LongLifeModificationEventInterface
+                $logEvent = new class ($value) extends ModificationEvent implements TrackedModificationEventInterface
                 {
-
                     private mixed $value;
 
                     public function __construct(mixed $value)
@@ -68,7 +67,6 @@ class ModificationEventsTraitTest extends TestCase
             public function setPrioritizedValue(mixed $value, int $priority = 100): void
             {
                 $logEvent = new class ($value) extends ModificationEvent {
-
                     private mixed $value;
 
                     public function __construct(mixed $value)
@@ -82,6 +80,41 @@ class ModificationEventsTraitTest extends TestCase
                     }
                 };
                 $logEvent->setPriority($priority);
+                $this->addModificationEvent($logEvent);
+            }
+
+            public function setSingletonValue(string $key, mixed $value, bool $rewriteExisted = false): void
+            {
+                $logEvent = new class ($key, $value, $rewriteExisted) extends ModificationEvent implements
+                    SingletonModificationEventInterface
+                {
+                    private string $key;
+
+                    private bool $rewriteExisted;
+                    private mixed $value;
+
+                    public function __construct(string $key, mixed $value, bool $rewriteExisted)
+                    {
+                        $this->key = $key;
+                        $this->value = $value;
+                        $this->rewriteExisted = $rewriteExisted;
+                    }
+
+                    public function getValue(): mixed
+                    {
+                        return $this->value;
+                    }
+
+                    public function getSingletonKey(): string
+                    {
+                        return $this->key;
+                    }
+
+                    public function isRewriteExisted(): bool
+                    {
+                        return $this->rewriteExisted;
+                    }
+                };
                 $this->addModificationEvent($logEvent);
             }
         };
@@ -99,13 +132,13 @@ class ModificationEventsTraitTest extends TestCase
         $this->assertEquals('qwer', $meModel->getModificationEvents()[1]->getValue());
         $this->assertEquals(0, $meModel->getModificationEvents()[1]->getPriority());
 
-        $meModel->setLongLifeValue('longLife');
+        $meModel->setTrackedValue('tracked');
         $this->assertCount(3, $meModel->getModificationEvents());
         $this->assertInstanceOf(
-            LongLifeModificationEventInterface::class,
+            TrackedModificationEventInterface::class,
             $meModel->getModificationEvents()[2],
         );
-        $this->assertEquals('longLife', $meModel->getModificationEvents()[2]->getValue());
+        $this->assertEquals('tracked', $meModel->getModificationEvents()[2]->getValue());
         $this->assertEquals(0, $meModel->getModificationEvents()[2]->getPriority());
 
         $meModel->setPrioritizedValue('priority-99', -99);
@@ -129,17 +162,42 @@ class ModificationEventsTraitTest extends TestCase
             return $event->getValue() === 123;
         })[0]->getValue());
 
-        $this->assertEquals('longLife', $meModel->getModificationEvents(function (object $event) {
-            return $event instanceof LongLifeModificationEventInterface;
-        })[2]->getValue());
+        $this->assertEquals('tracked', $meModel->getModificationEvents(function (object $event) {
+            return $event instanceof TrackedModificationEventInterface;
+        })[0]->getValue());
 
         $meModel->getModificationEvents(function (object $event) {
             return $event->getValue() === 123;
         })[0]->setDispatched();
         $this->assertCount(4, $meModel->getNotDispatchedModificationEvents());
 
+        // Test singleton events
+
+        $meModel->setSingletonValue('key1', 'value1', false);
+        $this->assertCount(5, $meModel->getNotDispatchedModificationEvents());
+        $meModel->setSingletonValue('key1', 'value5', false);
+        $this->assertCount(5, $meModel->getNotDispatchedModificationEvents());
+        $meModel->setSingletonValue('key2', 'value5', false);
+        $this->assertCount(6, $meModel->getNotDispatchedModificationEvents());
+
+        $this->assertEquals('value1', $meModel->getModificationEvents(function (object $event) {
+            return $event instanceof SingletonModificationEventInterface && $event->getSingletonKey() === 'key1';
+        })[0]->getValue());
+        $this->assertEquals('value5', $meModel->getModificationEvents(function (object $event) {
+            return $event instanceof SingletonModificationEventInterface && $event->getSingletonKey() === 'key2';
+        })[0]->getValue());
+
+        $meModel->setSingletonValue('key1', '100500', true);
+        $this->assertCount(6, $meModel->getNotDispatchedModificationEvents());
+        $this->assertEquals('100500', $meModel->getModificationEvents(function (object $event) {
+            return $event instanceof SingletonModificationEventInterface && $event->getSingletonKey() === 'key1';
+        })[0]->getValue());
+        $this->assertEquals('value5', $meModel->getModificationEvents(function (object $event) {
+            return $event instanceof SingletonModificationEventInterface && $event->getSingletonKey() === 'key2';
+        })[0]->getValue());
+
         $this->assertInstanceOf(get_class($meModel), $meModel->cleanupDispatchedModificationEvents());
-        $this->assertCount(4, $meModel->getModificationEvents());
+        $this->assertCount(6, $meModel->getModificationEvents());
 
         $this->assertInstanceOf(get_class($meModel), $meModel->cleanupModificationEvents(false));
         $this->assertCount(1, $meModel->getModificationEvents());

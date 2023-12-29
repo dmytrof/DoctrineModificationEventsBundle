@@ -11,7 +11,8 @@
 
 namespace Dmytrof\DoctrineModificationEventsBundle\Model\Traits;
 
-use Dmytrof\DoctrineModificationEventsBundle\Event\LongLifeModificationEventInterface;
+use Dmytrof\DoctrineModificationEventsBundle\Event\SingletonModificationEventInterface;
+use Dmytrof\DoctrineModificationEventsBundle\Event\TrackedModificationEventInterface;
 use Dmytrof\DoctrineModificationEventsBundle\Event\ModificationEventInterface;
 use Dmytrof\DoctrineModificationEventsBundle\Model\ModificationEventsInterface;
 use Closure;
@@ -33,7 +34,7 @@ trait ModificationEventsTrait
             return $this->modificationEvents;
         }
 
-        return \array_filter($this->getModificationEvents(), $filterCallback);
+        return \array_values(\array_filter($this->getModificationEvents(), $filterCallback));
     }
 
     /**
@@ -60,7 +61,36 @@ trait ModificationEventsTrait
      */
     public function addModificationEvent(ModificationEventInterface $event): static
     {
-        $this->modificationEvents[] = $event;
+        if ($event instanceof SingletonModificationEventInterface) {
+            $existedEvents = \array_filter(
+                $this->getModificationEvents(),
+                static fn (ModificationEventInterface $evt)
+                => $evt instanceof SingletonModificationEventInterface
+                    && $evt->getSingletonKey() === $event->getSingletonKey(),
+            );
+            if ($existedEvents && $event->isRewriteExisted()) {
+                $this->removeModificationEvent(...$existedEvents);
+            }
+            if (!$existedEvents || $event->isRewriteExisted()) {
+                $this->modificationEvents[] = $event;
+            }
+        } else {
+            $this->modificationEvents[] = $event;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Removes modification events
+     * @see ModificationEventsInterface::addModificationEvent()
+     */
+    public function removeModificationEvent(ModificationEventInterface $event): static
+    {
+        $events = \func_get_args();
+        $this->modificationEvents = $this->getModificationEvents(
+            static fn (ModificationEventInterface $evt) => !\in_array($evt, $events, true),
+        );
 
         return $this;
     }
@@ -69,12 +99,12 @@ trait ModificationEventsTrait
      * Clears modification events
      * @see ModificationEventsInterface::cleanupModificationEvents()
      */
-    public function cleanupModificationEvents(bool $withLongLifeEvents = true): static
+    public function cleanupModificationEvents(bool $withTrackedEvents = true): static
     {
-        $this->modificationEvents = $withLongLifeEvents
+        $this->modificationEvents = $withTrackedEvents
             ? []
             : $this->getModificationEvents(
-                static fn (ModificationEventInterface $event) => $event instanceof LongLifeModificationEventInterface,
+                static fn (ModificationEventInterface $event) => $event instanceof TrackedModificationEventInterface,
             );
 
         return $this;
@@ -88,7 +118,7 @@ trait ModificationEventsTrait
     {
         $this->modificationEvents = $this->getModificationEvents(
             static fn (ModificationEventInterface $event)
-                => $event instanceof LongLifeModificationEventInterface || !$event->isDispatched(),
+                => $event instanceof TrackedModificationEventInterface || !$event->isDispatched(),
         );
 
         return $this;

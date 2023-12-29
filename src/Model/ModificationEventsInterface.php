@@ -37,11 +37,18 @@ interface ModificationEventsInterface
     public function addModificationEvent(ModificationEventInterface $event): static;
 
     /**
-     * Clears modification events
-     * @param bool $withLongLifeEvents
+     * Removes modification event
+     * @param ModificationEventInterface $event
      * @return $this
      */
-    public function cleanupModificationEvents(bool $withLongLifeEvents = true): static;
+    public function removeModificationEvent(ModificationEventInterface $event): static;
+
+    /**
+     * Clears modification events
+     * @param bool $withTrackedEvents
+     * @return $this
+     */
+    public function cleanupModificationEvents(bool $withTrackedEvents = true): static;
 
     /**
      * Clears dispatched modification events
