@@ -14,93 +14,56 @@ namespace Dmytrof\DoctrineModificationEventsBundle\EventSubscriber;
 use Dmytrof\DoctrineModificationEventsBundle\Event\ForceFlushPreviousModificationsInterface;
 use Dmytrof\DoctrineModificationEventsBundle\Model\ModificationEventsInterface;
 use Doctrine\ORM\Event\PostFlushEventArgs;
+use Doctrine\ORM\Event\PostPersistEventArgs;
+use Doctrine\ORM\Event\PostRemoveEventArgs;
+use Doctrine\ORM\Event\PostUpdateEventArgs;
 use Doctrine\ORM\Events;
-use Doctrine\Common\EventSubscriber;
-use Doctrine\Persistence\Event\LifecycleEventArgs;
 use Doctrine\Persistence\ObjectManager;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
-class ModificationEventsDoctrineSubscriber implements EventSubscriber
+#[AsEventListener(event: Events::postPersist)]
+#[AsEventListener(event: Events::postUpdate)]
+#[AsEventListener(event: Events::postRemove)]
+#[AsEventListener(event: Events::postFlush)]
+class ModificationEventsDoctrineSubscriber
 {
-    /**
-     * @var EventDispatcherInterface
-     */
-    protected $eventDispatcher;
+    private EventDispatcherInterface $eventDispatcher;
 
-    /**
-     * @var array
-     */
-    protected $updatedEntities = [];
+    private array $updatedEntities = [];
 
-    /**
-     * @var bool
-     */
-    protected $needsFlush = false;
+    private bool $needsFlush = false;
 
-    /**
-     * ModelDoctrineSubscriber constructor.
-     * @param EventDispatcherInterface $eventDispatcher
-     */
     public function __construct(EventDispatcherInterface $eventDispatcher)
     {
         $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
-     * Get subscribed events
-     *
-     * @return array
-     */
-    public function getSubscribedEvents(): array
-    {
-        return [
-            Events::postPersist,
-            Events::postUpdate,
-            Events::postRemove,
-            Events::postFlush,
-        ];
-    }
-
-    /**
      * @param mixed $entity
      */
-    protected function addUpdatedEntityWithModificationEvents($entity): void
+    protected function addUpdatedEntityWithModificationEvents(mixed $entity): void
     {
         if ($entity instanceof ModificationEventsInterface) {
-           $this->addUpdatedEntity($entity);
+            $this->addUpdatedEntity($entity);
         }
     }
 
-    /**
-     * @param LifecycleEventArgs $args
-     * @return void
-     */
-    public function postPersist(LifecycleEventArgs $args): void
+    public function postPersist(PostPersistEventArgs $args): void
     {
         $this->addUpdatedEntityWithModificationEvents($args->getObject());
     }
 
-    /**
-     * @param LifecycleEventArgs $args
-     * @return void
-     */
-    public function postUpdate(LifecycleEventArgs $args): void
+    public function postUpdate(PostUpdateEventArgs $args): void
     {
         $this->addUpdatedEntityWithModificationEvents($args->getObject());
     }
 
-    /**
-     * @param LifecycleEventArgs $args
-     * @return void
-     */
-    public function postRemove(LifecycleEventArgs $args): void
+    public function postRemove(PostRemoveEventArgs $args): void
     {
         $this->addUpdatedEntityWithModificationEvents($args->getObject());
     }
 
-    /**
-     * @param PostFlushEventArgs $args
-     */
     public function postFlush(PostFlushEventArgs $args): void
     {
         if ($this->hasUpdatedEntities()) {
@@ -109,7 +72,7 @@ class ModificationEventsDoctrineSubscriber implements EventSubscriber
                     while ($events = $entity->getNotDispatchedModificationEvents()) {
                         foreach ($events as $event) {
                             if ($event instanceof ForceFlushPreviousModificationsInterface) {
-                                $this->makeFlushIfNeeded($args->getEntityManager());
+                                $this->makeFlushIfNeeded($args->getObjectManager());
                             }
                             $this->eventDispatcher->dispatch($event);
                             $event->setDispatched();
@@ -123,12 +86,12 @@ class ModificationEventsDoctrineSubscriber implements EventSubscriber
             }
             $this->cleanupUpdatedEntities();
         }
-        $this->makeFlushIfNeeded($args->getEntityManager());
+        $this->makeFlushIfNeeded($args->getObjectManager());
     }
 
     /**
      * Returns updated entities
-     * @return array
+     * @return array<int, ModificationEventsInterface>
      */
     protected function getUpdatedEntities(): array
     {
@@ -141,17 +104,17 @@ class ModificationEventsDoctrineSubscriber implements EventSubscriber
      */
     protected function hasUpdatedEntities(): bool
     {
-        return (bool) count($this->updatedEntities);
+        return !\empty($this->updatedEntities);
     }
 
     /**
      * Adds updated entity
-     * @param $entity
+     * @param ModificationEventsInterface $entity
      * @return $this
      */
-    protected function addUpdatedEntity($entity): self
+    protected function addUpdatedEntity(ModificationEventsInterface $entity): self
     {
-        $entityKey = spl_object_hash($entity);
+        $entityKey = \spl_object_hash($entity);
         if (!($this->updatedEntities[$entityKey] ?? false)) {
             $this->updatedEntities[$entityKey] = $entity;
         }

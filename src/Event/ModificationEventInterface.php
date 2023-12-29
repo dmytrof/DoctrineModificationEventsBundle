@@ -22,10 +22,9 @@ interface ModificationEventInterface
     /**
      * Sets dispatched
      * @param bool $dispatched
-     *
      * @return $this
      */
-    public function setDispatched(bool $dispatched = true): self;
+    public function setDispatched(bool $dispatched = true): static;
 
     /**
      * Checks if flush needed
@@ -36,10 +35,9 @@ interface ModificationEventInterface
     /**
      * Sets needs flush
      * @param bool $needsFlush
-     *
      * @return $this
      */
-    public function setNeedsFlush(bool $needsFlush): self;
+    public function setNeedsFlush(bool $needsFlush): static;
 
     /**
      * Returns priority
@@ -50,8 +48,7 @@ interface ModificationEventInterface
     /**
      * Sets priority
      * @param int $priority
-     *
      * @return $this
      */
-    public function setPriority(int $priority): self;
+    public function setPriority(int $priority): static;
 }

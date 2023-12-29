@@ -1,4 +1,4 @@
-name: PHP7.2 Composer v1
+name: PHP8.2
 
 on: [push]
 
@@ -13,8 +13,7 @@ jobs:
     - name: Setup PHP
       uses: shivammathur/setup-php@v2
       with:
-        php-version: '7.2'
-        tools: composer:v1, phpunit:v8.5, composer-require-checker, php-config
+        php-version: '8.2'
 
     - name: PHP version
       run: php --version
@@ -25,8 +24,5 @@ jobs:
     - name: Install dependencies
       run: composer install --prefer-dist --no-progress --no-suggest
 
-    # Add a tests script to composer.json, for instance: "tests": "vendor/bin/phpunit"
-    # Docs: https://getcomposer.org/doc/articles/scripts.md
-
     - name: Run tests suite
-      run: composer run-script tests
+      run: make unit-tests

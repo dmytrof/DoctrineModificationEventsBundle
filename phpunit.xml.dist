@@ -1,24 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<phpunit colors="true" bootstrap="vendor/autoload.php">
+<phpunit
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        colors="true"
+        bootstrap="vendor/autoload.php"
+        xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.5/phpunit.xsd"
+        cacheDirectory=".phpunit.cache"
+>
     <php>
-        <ini name="error_reporting" value="-1" />
+        <ini name="error_reporting" value="-1"/>
     </php>
-
     <testsuites>
-        <testsuite name="Symfony WebLink Component Test Suite">
+        <testsuite name="Test Suite">
             <directory suffix="Test.php">./tests</directory>
         </testsuite>
     </testsuites>
-
-    <filter>
-        <whitelist>
+    <source>
+        <include>
             <directory>./</directory>
-            <exclude>
-                <directory>./Resources</directory>
-                <directory>./Tests</directory>
-                <directory>./vendor</directory>
-            </exclude>
-        </whitelist>
-    </filter>
+        </include>
+        <exclude>
+            <directory>./vendor</directory>
+        </exclude>
+    </source>
 </phpunit>

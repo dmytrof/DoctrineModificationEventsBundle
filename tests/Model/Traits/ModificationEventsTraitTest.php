@@ -1,4 +1,4 @@
-<?php /** @noinspection PhpIllegalPsrClassPathInspection */
+<?php
 
 /*
  * This file is part of the DmytrofDoctrineModificationEventsBundle package.
@@ -13,32 +13,31 @@ namespace Dmytrof\DoctrineModificationEventsBundle\Tests\Model\Traits;
 
 use Dmytrof\DoctrineModificationEventsBundle\Event\LongLifeModificationEventInterface;
 use Dmytrof\DoctrineModificationEventsBundle\Event\ModificationEvent;
-use Dmytrof\DoctrineModificationEventsBundle\Event\ModificationEventInterface;
-use Dmytrof\DoctrineModificationEventsBundle\Model\{ModificationEventsInterface, Traits\ModificationEventsTrait};
+use Dmytrof\DoctrineModificationEventsBundle\Model\ModificationEventsInterface;
+use Dmytrof\DoctrineModificationEventsBundle\Model\Traits\ModificationEventsTrait;
 use PHPUnit\Framework\TestCase;
 
 class ModificationEventsTraitTest extends TestCase
 {
-    public function testModificationEvents()
+    public function testModificationEvents(): void
     {
-        $modelWithModificationEvents = new class implements ModificationEventsInterface {
+        $meModel = new class implements ModificationEventsInterface
+        {
             use ModificationEventsTrait;
 
-            public function setSomething($value): void
+            public function setSomething(mixed $value): void
             {
-                $logEvent = new class ($value) extends ModificationEvent {
+                $logEvent = new class ($value) extends ModificationEvent
+                {
 
-                    private $value;
+                    private mixed $value;
 
-                    public function __construct($value)
+                    public function __construct(mixed $value)
                     {
                         $this->value = $value;
                     }
 
-                    /**
-                     * @return mixed
-                     */
-                    public function getValue()
+                    public function getValue(): mixed
                     {
                         return $this->value;
                     }
@@ -46,21 +45,19 @@ class ModificationEventsTraitTest extends TestCase
                 $this->addModificationEvent($logEvent);
             }
 
-            public function setLongLifeValue($value): void
+            public function setLongLifeValue(mixed $value): void
             {
-                $logEvent = new class ($value) extends ModificationEvent implements LongLifeModificationEventInterface {
+                $logEvent = new class ($value) extends ModificationEvent implements LongLifeModificationEventInterface
+                {
 
-                    private $value;
+                    private mixed $value;
 
-                    public function __construct($value)
+                    public function __construct(mixed $value)
                     {
                         $this->value = $value;
                     }
 
-                    /**
-                     * @return mixed
-                     */
-                    public function getValue()
+                    public function getValue(): mixed
                     {
                         return $this->value;
                     }
@@ -68,21 +65,18 @@ class ModificationEventsTraitTest extends TestCase
                 $this->addModificationEvent($logEvent);
             }
 
-            public function setPrioritizedValue($value, int $priority = 100): void
+            public function setPrioritizedValue(mixed $value, int $priority = 100): void
             {
                 $logEvent = new class ($value) extends ModificationEvent {
 
-                    private $value;
+                    private mixed $value;
 
-                    public function __construct($value)
+                    public function __construct(mixed $value)
                     {
                         $this->value = $value;
                     }
 
-                    /**
-                     * @return mixed
-                     */
-                    public function getValue()
+                    public function getValue(): mixed
                     {
                         return $this->value;
                     }
@@ -92,62 +86,65 @@ class ModificationEventsTraitTest extends TestCase
             }
         };
 
-        $this->assertEquals([], $modelWithModificationEvents->getModificationEvents());
-        $modelWithModificationEvents->setSomething(123);
-        $this->assertCount(1, $modelWithModificationEvents->getModificationEvents());
-        $this->assertInstanceOf(ModificationEvent::class, $modelWithModificationEvents->getModificationEvents()[0]);
-        $this->assertEquals(123, $modelWithModificationEvents->getModificationEvents()[0]->getValue());
-        $this->assertEquals(0, $modelWithModificationEvents->getModificationEvents()[0]->getPriority());
+        $this->assertEquals([], $meModel->getModificationEvents());
+        $meModel->setSomething(123);
+        $this->assertCount(1, $meModel->getModificationEvents());
+        $this->assertInstanceOf(ModificationEvent::class, $meModel->getModificationEvents()[0]);
+        $this->assertEquals(123, $meModel->getModificationEvents()[0]->getValue());
+        $this->assertEquals(0, $meModel->getModificationEvents()[0]->getPriority());
 
-        $modelWithModificationEvents->setSomething('qwer');
-        $this->assertCount(2, $modelWithModificationEvents->getModificationEvents());
-        $this->assertInstanceOf(ModificationEvent::class, $modelWithModificationEvents->getModificationEvents()[1]);
-        $this->assertEquals('qwer', $modelWithModificationEvents->getModificationEvents()[1]->getValue());
-        $this->assertEquals(0, $modelWithModificationEvents->getModificationEvents()[1]->getPriority());
+        $meModel->setSomething('qwer');
+        $this->assertCount(2, $meModel->getModificationEvents());
+        $this->assertInstanceOf(ModificationEvent::class, $meModel->getModificationEvents()[1]);
+        $this->assertEquals('qwer', $meModel->getModificationEvents()[1]->getValue());
+        $this->assertEquals(0, $meModel->getModificationEvents()[1]->getPriority());
 
-        $modelWithModificationEvents->setLongLifeValue('longLife');
-        $this->assertCount(3, $modelWithModificationEvents->getModificationEvents());
-        $this->assertInstanceOf(LongLifeModificationEventInterface::class, $modelWithModificationEvents->getModificationEvents()[2]);
-        $this->assertEquals('longLife', $modelWithModificationEvents->getModificationEvents()[2]->getValue());
-        $this->assertEquals(0, $modelWithModificationEvents->getModificationEvents()[2]->getPriority());
+        $meModel->setLongLifeValue('longLife');
+        $this->assertCount(3, $meModel->getModificationEvents());
+        $this->assertInstanceOf(
+            LongLifeModificationEventInterface::class,
+            $meModel->getModificationEvents()[2],
+        );
+        $this->assertEquals('longLife', $meModel->getModificationEvents()[2]->getValue());
+        $this->assertEquals(0, $meModel->getModificationEvents()[2]->getPriority());
 
-        $modelWithModificationEvents->setPrioritizedValue('priority-99', -99);
-        $this->assertCount(4, $modelWithModificationEvents->getModificationEvents());
-        $this->assertInstanceOf(ModificationEvent::class, $modelWithModificationEvents->getModificationEvents()[3]);
-        $this->assertEquals('priority-99', $modelWithModificationEvents->getModificationEvents()[3]->getValue());
-        $this->assertEquals(-99, $modelWithModificationEvents->getModificationEvents()[3]->getPriority());
+        $meModel->setPrioritizedValue('priority-99', -99);
+        $this->assertCount(4, $meModel->getModificationEvents());
+        $this->assertInstanceOf(ModificationEvent::class, $meModel->getModificationEvents()[3]);
+        $this->assertEquals('priority-99', $meModel->getModificationEvents()[3]->getValue());
+        $this->assertEquals(-99, $meModel->getModificationEvents()[3]->getPriority());
 
-        $modelWithModificationEvents->setPrioritizedValue('priority100', 100);
-        $this->assertCount(5, $modelWithModificationEvents->getModificationEvents());
-        $this->assertInstanceOf(ModificationEvent::class, $modelWithModificationEvents->getModificationEvents()[4]);
-        $this->assertEquals('priority100', $modelWithModificationEvents->getModificationEvents()[4]->getValue());
-        $this->assertEquals(100, $modelWithModificationEvents->getModificationEvents()[4]->getPriority());
+        $meModel->setPrioritizedValue('priority100', 100);
+        $this->assertCount(5, $meModel->getModificationEvents());
+        $this->assertInstanceOf(ModificationEvent::class, $meModel->getModificationEvents()[4]);
+        $this->assertEquals('priority100', $meModel->getModificationEvents()[4]->getValue());
+        $this->assertEquals(100, $meModel->getModificationEvents()[4]->getPriority());
 
-        $this->assertCount(5, $notDispatchedEvents = $modelWithModificationEvents->getNotDispatchedModificationEvents());
+        $this->assertCount(5, $notDispatchedEvents = $meModel->getNotDispatchedModificationEvents());
 
         $this->assertEquals('priority100', $notDispatchedEvents[0]->getValue());
         $this->assertEquals('priority-99', $notDispatchedEvents[4]->getValue());
 
-        $this->assertEquals('123', $modelWithModificationEvents->getModificationEvents(function (ModificationEventInterface $event) {
+        $this->assertEquals('123', $meModel->getModificationEvents(function (object $event) {
             return $event->getValue() === 123;
         })[0]->getValue());
 
-        $this->assertEquals('longLife', $modelWithModificationEvents->getModificationEvents(function (ModificationEventInterface $event) {
+        $this->assertEquals('longLife', $meModel->getModificationEvents(function (object $event) {
             return $event instanceof LongLifeModificationEventInterface;
         })[2]->getValue());
 
-        $modelWithModificationEvents->getModificationEvents(function (ModificationEventInterface $event) {
+        $meModel->getModificationEvents(function (object $event) {
             return $event->getValue() === 123;
         })[0]->setDispatched();
-        $this->assertCount(4, $modelWithModificationEvents->getNotDispatchedModificationEvents());
+        $this->assertCount(4, $meModel->getNotDispatchedModificationEvents());
 
-        $this->assertInstanceOf(get_class($modelWithModificationEvents), $modelWithModificationEvents->cleanupDispatchedModificationEvents());
-        $this->assertCount(4, $modelWithModificationEvents->getModificationEvents());
+        $this->assertInstanceOf(get_class($meModel), $meModel->cleanupDispatchedModificationEvents());
+        $this->assertCount(4, $meModel->getModificationEvents());
 
-        $this->assertInstanceOf(get_class($modelWithModificationEvents), $modelWithModificationEvents->cleanupModificationEvents(false));
-        $this->assertCount(1, $modelWithModificationEvents->getModificationEvents());
+        $this->assertInstanceOf(get_class($meModel), $meModel->cleanupModificationEvents(false));
+        $this->assertCount(1, $meModel->getModificationEvents());
 
-        $this->assertInstanceOf(get_class($modelWithModificationEvents), $modelWithModificationEvents->cleanupModificationEvents());
-        $this->assertCount(0, $modelWithModificationEvents->getModificationEvents());
+        $this->assertInstanceOf(get_class($meModel), $meModel->cleanupModificationEvents());
+        $this->assertCount(0, $meModel->getModificationEvents());
     }
 }

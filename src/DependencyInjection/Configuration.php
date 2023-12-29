@@ -11,7 +11,8 @@
 
 namespace Dmytrof\DoctrineModificationEventsBundle\DependencyInjection;
 
-use Symfony\Component\Config\Definition\{Builder\TreeBuilder, ConfigurationInterface};
+use Symfony\Component\Config\Definition\Builder\TreeBuilder;
+use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 class Configuration implements ConfigurationInterface
 {

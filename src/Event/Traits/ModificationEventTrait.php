@@ -15,20 +15,11 @@ use Dmytrof\DoctrineModificationEventsBundle\Event\ModificationEventInterface;
 
 trait ModificationEventTrait
 {
-    /**
-     * @var bool
-     */
-    protected $needsFlush = false;
+    protected bool $needsFlush = false;
 
-    /**
-     * @var bool
-     */
-    protected $dispatched = false;
+    protected bool $dispatched = false;
 
-    /**
-     * @var int
-     */
-    protected $priority = 0;
+    protected int $priority = 0;
 
     /**
      * Checks if flush needed
@@ -43,7 +34,7 @@ trait ModificationEventTrait
      * Sets needs flush
      * @see ModificationEventInterface::setNeedsFlush()
      */
-    public function setNeedsFlush(bool $needsFlush = true): ModificationEventInterface
+    public function setNeedsFlush(bool $needsFlush = true): static
     {
         $this->needsFlush = $needsFlush;
 
@@ -63,7 +54,7 @@ trait ModificationEventTrait
      * Sets dispatched
      * @see ModificationEventInterface::setDispatched()
      */
-    public function setDispatched(bool $dispatched = true): ModificationEventInterface
+    public function setDispatched(bool $dispatched = true): static
     {
         $this->dispatched = $dispatched;
 
@@ -83,7 +74,7 @@ trait ModificationEventTrait
      * Sets priority
      * @see ModificationEventInterface::setPriority()
      */
-    public function setPriority(int $priority): ModificationEventInterface
+    public function setPriority(int $priority): static
     {
         $this->priority = $priority;
 

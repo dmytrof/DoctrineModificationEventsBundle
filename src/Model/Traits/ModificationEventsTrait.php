@@ -19,9 +19,9 @@ use Closure;
 trait ModificationEventsTrait
 {
     /**
-     * @var array
+     * @var array<int, ModificationEventInterface>
      */
-    protected $modificationEvents = [];
+    protected array $modificationEvents = [];
 
     /**
      * Returns modification events
@@ -33,7 +33,7 @@ trait ModificationEventsTrait
             return $this->modificationEvents;
         }
 
-        return array_filter($this->getModificationEvents(), $filterCallback);
+        return \array_filter($this->getModificationEvents(), $filterCallback);
     }
 
     /**
@@ -42,12 +42,14 @@ trait ModificationEventsTrait
      */
     public function getNotDispatchedModificationEvents(): array
     {
-        $events = $this->getModificationEvents(function (ModificationEventInterface $event) {
-            return !$event->isDispatched();
-        });
-        usort($events, static function (ModificationEventInterface $eventA, ModificationEventInterface $eventB) {
-            return $eventB->getPriority() <=> $eventA->getPriority();
-        });
+        $events = $this->getModificationEvents(
+            static fn (ModificationEventInterface $event) => !$event->isDispatched(),
+        );
+        \usort(
+            $events,
+            static fn (ModificationEventInterface $eventA, ModificationEventInterface $eventB)
+                => $eventB->getPriority() <=> $eventA->getPriority(),
+        );
 
         return $events;
     }
@@ -56,7 +58,7 @@ trait ModificationEventsTrait
      * Adds modification events
      * @see ModificationEventsInterface::addModificationEvent()
      */
-    public function addModificationEvent(ModificationEventInterface $event): ModificationEventsInterface
+    public function addModificationEvent(ModificationEventInterface $event): static
     {
         $this->modificationEvents[] = $event;
 
@@ -67,11 +69,13 @@ trait ModificationEventsTrait
      * Clears modification events
      * @see ModificationEventsInterface::cleanupModificationEvents()
      */
-    public function cleanupModificationEvents(bool $withLongLifeEvents = true): ModificationEventsInterface
+    public function cleanupModificationEvents(bool $withLongLifeEvents = true): static
     {
-        $this->modificationEvents = $withLongLifeEvents ? [] : $this->getModificationEvents(function (ModificationEventInterface $event) {
-            return $event instanceof LongLifeModificationEventInterface;
-        });
+        $this->modificationEvents = $withLongLifeEvents
+            ? []
+            : $this->getModificationEvents(
+                static fn (ModificationEventInterface $event) => $event instanceof LongLifeModificationEventInterface,
+            );
 
         return $this;
     }
@@ -80,13 +84,12 @@ trait ModificationEventsTrait
      * Clears dispatcher modification events
      * @see ModificationEventsInterface::cleanupDispatchedModificationEvents()
      */
-    public function cleanupDispatchedModificationEvents(): ModificationEventsInterface
+    public function cleanupDispatchedModificationEvents(): static
     {
-        $this->modificationEvents = $this->getModificationEvents(function (ModificationEventInterface $event) {
-            return $event instanceof LongLifeModificationEventInterface
-                || !$event->isDispatched()
-            ;
-        });
+        $this->modificationEvents = $this->getModificationEvents(
+            static fn (ModificationEventInterface $event)
+                => $event instanceof LongLifeModificationEventInterface || !$event->isDispatched(),
+        );
 
         return $this;
     }
