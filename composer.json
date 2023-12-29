@@ -4,6 +4,8 @@
     "description": "Symfony DmytrofDoctrineModificationEventsBundle to create and handle events on entities updates",
     "keywords": ["Doctrine", "Modification events"],
     "license": "MIT",
+    "version": "v1.5",
+    "time": "2023-12-29",
     "authors": [
         {
             "name": "Dmytro Feshchenko",
@@ -12,7 +14,7 @@
     ],
     "require": {
         "php": ">=8.0",
-        "doctrine/orm": "^2.6",
+        "doctrine/orm": "^2.8",
         "symfony/framework-bundle": "^5.4 || ^6.0",
         "symfony/event-dispatcher": "^5.4 || ^6.0"
     },
