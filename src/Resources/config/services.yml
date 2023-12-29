@@ -3,3 +3,10 @@ services:
         autowire: true      # Automatically injects dependencies in your services.
         autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
         public: false       # Allows optimizing the container by removing unused services; this also means
+
+    Dmytrof\DoctrineModificationEventsBundle\EventSubscriber\ModificationEventsDoctrineSubscriber:
+        tags:
+            - { name: doctrine.event_listener, event: 'postPersist', priority: -999 }
+            - { name: doctrine.event_listener, event: 'postUpdate', priority: -999 }
+            - { name: doctrine.event_listener, event: 'postRemove', priority: -999 }
+            - { name: doctrine.event_listener, event: 'postFlush', priority: 999 }

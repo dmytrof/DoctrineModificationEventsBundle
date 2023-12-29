@@ -17,15 +17,9 @@ use Doctrine\ORM\Event\PostFlushEventArgs;
 use Doctrine\ORM\Event\PostPersistEventArgs;
 use Doctrine\ORM\Event\PostRemoveEventArgs;
 use Doctrine\ORM\Event\PostUpdateEventArgs;
-use Doctrine\ORM\Events;
 use Doctrine\Persistence\ObjectManager;
-use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
-#[AsEventListener(event: Events::postPersist)]
-#[AsEventListener(event: Events::postUpdate)]
-#[AsEventListener(event: Events::postRemove)]
-#[AsEventListener(event: Events::postFlush)]
 class ModificationEventsDoctrineSubscriber
 {
     private EventDispatcherInterface $eventDispatcher;
@@ -104,7 +98,7 @@ class ModificationEventsDoctrineSubscriber
      */
     protected function hasUpdatedEntities(): bool
     {
-        return !\empty($this->updatedEntities);
+        return !empty($this->updatedEntities);
     }
 
     /**
