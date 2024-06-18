@@ -28,6 +28,8 @@ class ModificationEventsDoctrineSubscriber
 
     private bool $needsFlush = false;
 
+    private bool $skipPostFlush = false;
+
     public function __construct(EventDispatcherInterface $eventDispatcher)
     {
         $this->eventDispatcher = $eventDispatcher;
@@ -60,12 +62,16 @@ class ModificationEventsDoctrineSubscriber
 
     public function postFlush(PostFlushEventArgs $args): void
     {
+        if ($this->skipPostFlush) {
+            return;
+        }
         if ($this->hasUpdatedEntities()) {
             foreach ($this->getUpdatedEntities() as $entity) {
                 if ($entity instanceof ModificationEventsInterface) {
                     while ($events = $entity->getNotDispatchedModificationEvents()) {
                         foreach ($events as $event) {
                             if ($event instanceof ForceFlushPreviousModificationsInterface) {
+                                $this->skipPostFlush = true;
                                 $this->makeFlushIfNeeded($args->getObjectManager());
                             }
                             $this->eventDispatcher->dispatch($event);
@@ -150,6 +156,7 @@ class ModificationEventsDoctrineSubscriber
             $this->needsFlush = false;
             $objectManager->flush();
         }
+        $this->skipPostFlush = false;
 
         return $this;
     }
