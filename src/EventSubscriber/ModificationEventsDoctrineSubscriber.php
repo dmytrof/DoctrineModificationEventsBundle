@@ -66,22 +66,25 @@ class ModificationEventsDoctrineSubscriber
             return;
         }
         if ($this->hasUpdatedEntities()) {
-            foreach ($this->getUpdatedEntities() as $entity) {
-                if ($entity instanceof ModificationEventsInterface) {
-                    while ($events = $entity->getNotDispatchedModificationEvents()) {
-                        foreach ($events as $event) {
-                            if ($event instanceof ForceFlushPreviousModificationsInterface) {
-                                $this->skipPostFlush = true;
-                                $this->makeFlushIfNeeded($args->getObjectManager());
+            while (count($this->getUpdatedEntities()) > 0) {
+                foreach ($this->getUpdatedEntities() as $entityKey => $entity) {
+                    if ($entity instanceof ModificationEventsInterface) {
+                        while ($events = $entity->getNotDispatchedModificationEvents()) {
+                            foreach ($events as $event) {
+                                if ($event instanceof ForceFlushPreviousModificationsInterface) {
+                                    $this->skipPostFlush = true;
+                                    $this->makeFlushIfNeeded($args->getObjectManager());
+                                }
+                                $this->eventDispatcher->dispatch($event);
+                                $event->setDispatched();
+                                if ($event->isNeedsFlush()) {
+                                    $this->setNeedsFlush();
+                                }
                             }
-                            $this->eventDispatcher->dispatch($event);
-                            $event->setDispatched();
-                            if ($event->isNeedsFlush()) {
-                                $this->setNeedsFlush();
-                            }
+                            $entity->cleanupDispatchedModificationEvents();
                         }
-                        $entity->cleanupDispatchedModificationEvents();
                     }
+                    $this->removeUpdatedEntity($entityKey);
                 }
             }
             $this->cleanupUpdatedEntities();
@@ -105,6 +108,13 @@ class ModificationEventsDoctrineSubscriber
     protected function hasUpdatedEntities(): bool
     {
         return !empty($this->updatedEntities);
+    }
+
+    protected function removeUpdatedEntity(string $entityKey): self
+    {
+        unset($this->updatedEntities[$entityKey]);
+
+        return $this;
     }
 
     /**
