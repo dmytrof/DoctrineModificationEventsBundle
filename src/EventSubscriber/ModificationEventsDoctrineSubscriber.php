@@ -94,7 +94,7 @@ class ModificationEventsDoctrineSubscriber
 
     /**
      * Returns updated entities
-     * @return array<int, ModificationEventsInterface>
+     * @return array<string, ModificationEventsInterface>
      */
     protected function getUpdatedEntities(): array
     {
