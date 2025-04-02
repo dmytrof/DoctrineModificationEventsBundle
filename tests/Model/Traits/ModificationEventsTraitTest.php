@@ -105,11 +105,13 @@ class ModificationEventsTraitTest extends TestCase
                         return $this->value;
                     }
 
+                    #[\Override]
                     public function getSingletonKey(): string
                     {
                         return $this->key;
                     }
 
+                    #[\Override]
                     public function isRewriteExisted(): bool
                     {
                         return $this->rewriteExisted;
