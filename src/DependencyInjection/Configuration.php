@@ -19,6 +19,7 @@ class Configuration implements ConfigurationInterface
     /**
      * @inheritDoc
      */
+    #[\Override]
     public function getConfigTreeBuilder(): TreeBuilder
     {
         return new TreeBuilder('dmytrof_doctrine_modification_events');
