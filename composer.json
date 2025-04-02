@@ -4,8 +4,8 @@
     "description": "Symfony DmytrofDoctrineModificationEventsBundle to create and handle events on entities updates",
     "keywords": ["Doctrine", "Modification events"],
     "license": "MIT",
-    "version": "v1.6.1",
-    "time": "2023-12-29",
+    "version": "v1.7",
+    "time": "2025-04-02",
     "authors": [
         {
             "name": "Dmytro Feshchenko",
