@@ -28,7 +28,7 @@ trait ModificationEventsTrait
      * Returns modification events
      * @see ModificationEventsInterface::getModificationEvents()
      */
-    public function getModificationEvents(Closure $filterCallback = null): array
+    public function getModificationEvents(?Closure $filterCallback = null): array
     {
         if (!$filterCallback) {
             return $this->modificationEvents;

@@ -21,7 +21,7 @@ interface ModificationEventsInterface
      * @param Closure|null $filterCallback
      * @return array|ModificationEventInterface[]
      */
-    public function getModificationEvents(Closure $filterCallback = null): array;
+    public function getModificationEvents(?Closure $filterCallback = null): array;
 
     /**
      * Returns not dispatched modification events
