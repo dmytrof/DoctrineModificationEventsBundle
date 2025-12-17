@@ -26,7 +26,6 @@ trait ModificationEventsTrait
 
     /**
      * Returns modification events
-     * @see ModificationEventsInterface::getModificationEvents()
      * @return array<array-key, ModificationEventInterface>
      */
     public function getModificationEvents(?Closure $filterCallback = null): array
@@ -36,6 +35,30 @@ trait ModificationEventsTrait
         }
 
         return \array_values(\array_filter($this->getModificationEvents(), $filterCallback));
+    }
+
+    /**
+     * Returns modification events of class
+     * @return array<array-key, ModificationEventInterface>
+     */
+    public function getModificationEventsOfClass(string $className): array
+    {
+        return $this->getModificationEvents(
+            fn (ModificationEventInterface $modificationEvent)
+                => $modificationEvent::class === $className,
+        );
+    }
+
+    /**
+     * Returns modification events of class or which are extend class
+     * @return array<array-key, ModificationEventInterface>
+     */
+    public function getModificationEventsInstanceOf(string $className): array
+    {
+        return $this->getModificationEvents(
+            fn (ModificationEventInterface $modificationEvent)
+            => \is_a($modificationEvent, $className),
+        );
     }
 
     /**

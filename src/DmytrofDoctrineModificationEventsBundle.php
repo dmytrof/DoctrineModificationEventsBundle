@@ -21,6 +21,6 @@ class DmytrofDoctrineModificationEventsBundle extends AbstractBundle
     #[Override]
     public function loadExtension(array $config, ContainerConfigurator $container, ContainerBuilder $builder): void
     {
-        $container->import('Resources/config/services.yaml');
+        $container->import('config/services.yaml');
     }
 }

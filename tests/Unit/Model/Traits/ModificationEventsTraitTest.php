@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Dmytrof\DoctrineModificationEventsBundle\Tests\Model\Traits;
+namespace Dmytrof\DoctrineModificationEventsBundle\Tests\Unit\Model\Model\Traits;
 
 use Dmytrof\DoctrineModificationEventsBundle\Event\ModificationEvent;
 use Dmytrof\DoctrineModificationEventsBundle\Event\SingletonModificationEventInterface;

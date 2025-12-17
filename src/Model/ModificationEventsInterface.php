@@ -23,6 +23,12 @@ interface ModificationEventsInterface
     public function getModificationEvents(?Closure $filterCallback = null): array;
 
     /**
+     * Returns modification events of class
+     * @return array<array-key, ModificationEventInterface>
+     */
+    public function getModificationEventsOfClass(string $className): array;
+
+    /**
      * Returns not dispatched modification events
      */
     public function getNotDispatchedModificationEvents(): array;

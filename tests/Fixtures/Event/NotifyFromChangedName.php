@@ -9,11 +9,15 @@
  * file that was distributed with this source code.
  */
 
-namespace Dmytrof\DoctrineModificationEventsBundle\Event;
+namespace Dmytrof\DoctrineModificationEventsBundle\Tests\Fixtures\Event;
 
-/**
- * @deprecated Will be removed on next versions. Use TrackedModificationEventInterface instead
- */
-interface LongLifeModificationEventInterface extends ModificationEventInterface, TrackedModificationEventInterface
+use Override;
+
+class NotifyFromChangedName extends NotifyChangedName
 {
+    #[Override]
+    public function isRewriteExisted(): bool
+    {
+        return false;
+    }
 }

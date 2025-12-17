@@ -1,0 +1,32 @@
+parameters:
+    env(DATABASE_URL): 'sqlite:///:memory:'
+    env(audit_bundle_enabled): 'true'
+
+doctrine:
+    dbal:
+        url: "%env(resolve:DATABASE_URL)%"
+    orm:
+        auto_mapping: true
+        mappings:
+            EntityCRUDTestFixtures:
+                type: attribute
+                dir: "%kernel.project_dir%/tests/Fixtures/Entity"
+                is_bundle: false
+                prefix: Dmytrof\DoctrineModificationEventsBundle\Tests\Fixtures\Entity
+
+framework:
+    test: true
+    session:
+        storage_factory_id: session.storage.factory.mock_file
+        handler_id: ~
+
+services:
+    _defaults:
+        autowire: true      # Automatically injects dependencies in your services.
+        autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+        public: false       # Allows optimizing the container by removing unused services; this also means
+
+    Dmytrof\DoctrineModificationEventsBundle\Tests\Fixtures\EventSubscriber\EventsSubscriber:
+
+    Dmytrof\DoctrineModificationEventsBundle\Tests\Fixtures\Service\CategoryNotifier:
+        public: true
