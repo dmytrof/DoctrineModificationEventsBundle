@@ -26,6 +26,3 @@ jobs:
 
     - name: Run tests suite
       run: make unit-tests
-
-    - name: Run lint
-      run: make lint

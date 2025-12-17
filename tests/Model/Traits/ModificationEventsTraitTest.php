@@ -11,9 +11,9 @@
 
 namespace Dmytrof\DoctrineModificationEventsBundle\Tests\Model\Traits;
 
+use Dmytrof\DoctrineModificationEventsBundle\Event\ModificationEvent;
 use Dmytrof\DoctrineModificationEventsBundle\Event\SingletonModificationEventInterface;
 use Dmytrof\DoctrineModificationEventsBundle\Event\TrackedModificationEventInterface;
-use Dmytrof\DoctrineModificationEventsBundle\Event\ModificationEvent;
 use Dmytrof\DoctrineModificationEventsBundle\Model\ModificationEventsInterface;
 use Dmytrof\DoctrineModificationEventsBundle\Model\Traits\ModificationEventsTrait;
 use PHPUnit\Framework\TestCase;
@@ -161,7 +161,7 @@ class ModificationEventsTraitTest extends TestCase
         $this->assertEquals('priority-99', $notDispatchedEvents[4]->getValue());
 
         $this->assertEquals('123', $meModel->getModificationEvents(function (object $event) {
-            return $event->getValue() === 123;
+            return 123 === $event->getValue();
         })[0]->getValue());
 
         $this->assertEquals('tracked', $meModel->getModificationEvents(function (object $event) {
@@ -169,7 +169,7 @@ class ModificationEventsTraitTest extends TestCase
         })[0]->getValue());
 
         $meModel->getModificationEvents(function (object $event) {
-            return $event->getValue() === 123;
+            return 123 === $event->getValue();
         })[0]->setDispatched();
         $this->assertCount(4, $meModel->getNotDispatchedModificationEvents());
 
@@ -183,28 +183,28 @@ class ModificationEventsTraitTest extends TestCase
         $this->assertCount(6, $meModel->getNotDispatchedModificationEvents());
 
         $this->assertEquals('value1', $meModel->getModificationEvents(function (object $event) {
-            return $event instanceof SingletonModificationEventInterface && $event->getSingletonKey() === 'key1';
+            return $event instanceof SingletonModificationEventInterface && 'key1' === $event->getSingletonKey();
         })[0]->getValue());
         $this->assertEquals('value5', $meModel->getModificationEvents(function (object $event) {
-            return $event instanceof SingletonModificationEventInterface && $event->getSingletonKey() === 'key2';
+            return $event instanceof SingletonModificationEventInterface && 'key2' === $event->getSingletonKey();
         })[0]->getValue());
 
         $meModel->setSingletonValue('key1', '100500', true);
         $this->assertCount(6, $meModel->getNotDispatchedModificationEvents());
         $this->assertEquals('100500', $meModel->getModificationEvents(function (object $event) {
-            return $event instanceof SingletonModificationEventInterface && $event->getSingletonKey() === 'key1';
+            return $event instanceof SingletonModificationEventInterface && 'key1' === $event->getSingletonKey();
         })[0]->getValue());
         $this->assertEquals('value5', $meModel->getModificationEvents(function (object $event) {
-            return $event instanceof SingletonModificationEventInterface && $event->getSingletonKey() === 'key2';
+            return $event instanceof SingletonModificationEventInterface && 'key2' === $event->getSingletonKey();
         })[0]->getValue());
 
-        $this->assertInstanceOf(get_class($meModel), $meModel->cleanupDispatchedModificationEvents());
+        $this->assertInstanceOf(\get_class($meModel), $meModel->cleanupDispatchedModificationEvents());
         $this->assertCount(6, $meModel->getModificationEvents());
 
-        $this->assertInstanceOf(get_class($meModel), $meModel->cleanupModificationEvents(false));
+        $this->assertInstanceOf(\get_class($meModel), $meModel->cleanupModificationEvents(false));
         $this->assertCount(1, $meModel->getModificationEvents());
 
-        $this->assertInstanceOf(get_class($meModel), $meModel->cleanupModificationEvents());
+        $this->assertInstanceOf(\get_class($meModel), $meModel->cleanupModificationEvents());
         $this->assertCount(0, $meModel->getModificationEvents());
     }
 }

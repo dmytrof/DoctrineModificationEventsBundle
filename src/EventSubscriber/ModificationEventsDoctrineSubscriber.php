@@ -35,9 +35,6 @@ class ModificationEventsDoctrineSubscriber
         $this->eventDispatcher = $eventDispatcher;
     }
 
-    /**
-     * @param mixed $entity
-     */
     protected function addUpdatedEntityWithModificationEvents(mixed $entity): void
     {
         if ($entity instanceof ModificationEventsInterface) {
@@ -66,7 +63,7 @@ class ModificationEventsDoctrineSubscriber
             return;
         }
         if ($this->hasUpdatedEntities()) {
-            while (count($this->getUpdatedEntities()) > 0) {
+            while (\count($this->getUpdatedEntities()) > 0) {
                 foreach ($this->getUpdatedEntities() as $entityKey => $entity) {
                     if ($entity instanceof ModificationEventsInterface) {
                         while ($events = $entity->getNotDispatchedModificationEvents()) {
@@ -103,7 +100,6 @@ class ModificationEventsDoctrineSubscriber
 
     /**
      * Checks updated entities exists
-     * @return bool
      */
     protected function hasUpdatedEntities(): bool
     {
@@ -119,8 +115,6 @@ class ModificationEventsDoctrineSubscriber
 
     /**
      * Adds updated entity
-     * @param ModificationEventsInterface $entity
-     * @return $this
      */
     protected function addUpdatedEntity(ModificationEventsInterface $entity): self
     {
@@ -134,7 +128,6 @@ class ModificationEventsDoctrineSubscriber
 
     /**
      * Cleans up updated entities
-     * @return $this
      */
     protected function cleanupUpdatedEntities(): self
     {
@@ -145,8 +138,6 @@ class ModificationEventsDoctrineSubscriber
 
     /**
      * Sets need flush
-     * @param bool $needsFlush
-     * @return $this
      */
     protected function setNeedsFlush(bool $needsFlush = true): self
     {
@@ -157,8 +148,6 @@ class ModificationEventsDoctrineSubscriber
 
     /**
      * Makes flush if needed
-     * @param ObjectManager $objectManager
-     * @return $this
      */
     protected function makeFlushIfNeeded(ObjectManager $objectManager): self
     {

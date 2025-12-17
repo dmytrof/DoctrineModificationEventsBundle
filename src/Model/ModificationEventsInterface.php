@@ -11,48 +11,39 @@
 
 namespace Dmytrof\DoctrineModificationEventsBundle\Model;
 
-use Dmytrof\DoctrineModificationEventsBundle\Event\ModificationEventInterface;
 use Closure;
+use Dmytrof\DoctrineModificationEventsBundle\Event\ModificationEventInterface;
 
 interface ModificationEventsInterface
 {
     /**
      * Returns modification events
-     * @param Closure|null $filterCallback
-     * @return array|ModificationEventInterface[]
+     * @return array<array-key, ModificationEventInterface>
      */
     public function getModificationEvents(?Closure $filterCallback = null): array;
 
     /**
      * Returns not dispatched modification events
-     * @return array
      */
     public function getNotDispatchedModificationEvents(): array;
 
     /**
      * Adds modification events
-     * @param ModificationEventInterface $event
-     * @return $this
      */
     public function addModificationEvent(ModificationEventInterface $event): static;
 
     /**
      * Removes modification event
-     * @param ModificationEventInterface $event
-     * @return $this
      */
     public function removeModificationEvent(ModificationEventInterface $event): static;
 
     /**
      * Clears modification events
-     * @param bool $withTrackedEvents
-     * @return $this
      */
     public function cleanupModificationEvents(bool $withTrackedEvents = true): static;
 
     /**
      * Clears dispatched modification events
-     * @return $this
      */
     public function cleanupDispatchedModificationEvents(): static;
 }

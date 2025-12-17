@@ -11,22 +11,23 @@
 
 namespace Dmytrof\DoctrineModificationEventsBundle\Model\Traits;
 
+use Closure;
+use Dmytrof\DoctrineModificationEventsBundle\Event\ModificationEventInterface;
 use Dmytrof\DoctrineModificationEventsBundle\Event\SingletonModificationEventInterface;
 use Dmytrof\DoctrineModificationEventsBundle\Event\TrackedModificationEventInterface;
-use Dmytrof\DoctrineModificationEventsBundle\Event\ModificationEventInterface;
 use Dmytrof\DoctrineModificationEventsBundle\Model\ModificationEventsInterface;
-use Closure;
 
 trait ModificationEventsTrait
 {
     /**
-     * @var array<int, ModificationEventInterface>
+     * @var array<array-key, ModificationEventInterface>
      */
     protected array $modificationEvents = [];
 
     /**
      * Returns modification events
      * @see ModificationEventsInterface::getModificationEvents()
+     * @return array<array-key, ModificationEventInterface>
      */
     public function getModificationEvents(?Closure $filterCallback = null): array
     {
