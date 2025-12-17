@@ -26,7 +26,10 @@
         "vimeo/psalm": "^5.18 || ^6.13"
     },
     "config": {
-        "sort-packages": true
+        "sort-packages": true,
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        }
     },
     "autoload": {
         "psr-4": {
@@ -39,6 +42,6 @@
         }
     },
     "scripts": {
-        "tests": "phpunit"
+        "tests": "make unit-tests"
     }
 }
