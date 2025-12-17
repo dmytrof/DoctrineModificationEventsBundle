@@ -1,7 +1,7 @@
 DmytrofDoctrineModificationEventsBundle
 ====================
 
-This bundle helps you to create and handle events on entities updates for your Symfony 4/5 application
+This bundle helps you to create and handle events on entities updates for your Symfony 7/8 application
 
 ## Installation
 
@@ -18,5 +18,3 @@ This bundle helps you to create and handle events on entities updates for your S
             // ...
             Dmytrof\DoctrineModificationEventsBundle\DmytrofDoctrineModificationEventsBundle::class => ['all' => true],
         ];
-        
-        
