@@ -1,11 +1,11 @@
 {
     "name": "dmytrof/doctrine-modification-events-bundle",
     "type": "symfony-bundle",
-    "description": "Symfony DmytrofDoctrineModificationEventsBundle to create and handle events on entities updates",
+    "description": "Symfony 7/8 DmytrofDoctrineModificationEventsBundle to create and handle events on entities updates",
     "keywords": ["Doctrine", "Modification events"],
     "license": "MIT",
     "version": "v2.0",
-    "time": "2025-04-02",
+    "time": "2025-12-17",
     "authors": [
         {
             "name": "Dmytro Feshchenko",
