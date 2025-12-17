@@ -181,5 +181,4 @@
         <!--            </errorLevel>-->
         <!--        </LessSpecificImplementedReturnType>-->
     </issueHandlers>
-    <plugins><pluginClass class="Weirdan\DoctrinePsalmPlugin\Plugin"/></plugins>
 </psalm>
